@@ -5,9 +5,6 @@ Bundler.require
 $: << File.expand_path('../', __FILE__)
 $: << File.expand_path('../lib', __FILE__)
 
-require 'dotenv'
-Dotenv.load
-
 require 'app/routes'
 
 module R53Dyn
