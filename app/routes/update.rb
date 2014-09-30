@@ -56,7 +56,8 @@ module R53Dyn
           resp_data = dnslib.update_record(zoneid, domain, ipaddr)
 
           if resp_data
-            'OK'
+            uri = 'http://%s' % domain
+            @response.headers[:location] = uri
           else
             error 500, 'Updating hostname failed'
           end
