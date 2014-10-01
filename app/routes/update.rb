@@ -58,7 +58,7 @@ module R53Dyn
           if resp_data
             #uri = 'http://%s' % domain
             #@response.headers['Location'] = uri
-            "good %\n" % ipaddr
+            "good %s\n" % ipaddr
           else
             error 500, 'Updating hostname failed'
           end
