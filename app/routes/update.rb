@@ -57,7 +57,7 @@ module R53Dyn
 
           if resp_data
             uri = 'http://%s' % domain
-            @response.headers[:location] = uri
+            @response.headers['Location'] = uri
           else
             error 500, 'Updating hostname failed'
           end
