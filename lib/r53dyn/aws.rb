@@ -44,7 +44,7 @@ module R53Dyn
             :resource_record_set => {
                 :name => record,
                 :type => 'A',
-                :ttl => 86400,
+                :ttl => 180,
                 :resource_records => [{:value => ipaddr}]
             }}
 
