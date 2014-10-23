@@ -39,14 +39,7 @@ module R53Dyn
       end
 
       begin
-        change = {
-            :action => 'UPSERT',
-            :resource_record_set => {
-                :name => record,
-                :type => 'A',
-                :ttl => 180,
-                :resource_records => [{:value => ipaddr}]
-            }}
+        change = prepare_record(ipaddr, record)
 
         # Send the change record to the AWS api
         change_resp = @r53.client.change_resource_record_sets({
@@ -60,6 +53,17 @@ module R53Dyn
       rescue
         false
       end
+    end
+
+    def prepare_record(ipaddr, record)
+      {
+          :action => 'UPSERT',
+          :resource_record_set => {
+              :name => record,
+              :type => 'A',
+              :ttl => 180,
+              :resource_records => [{:value => ipaddr}]
+          }}
     end
   end
 end

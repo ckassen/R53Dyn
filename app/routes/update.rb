@@ -1,4 +1,4 @@
-# r53dyn.rb
+# update.rb
 
 require 'sinatra/base'
 require 'aws-sdk'

@@ -2,5 +2,7 @@
 
 .idea/*
 
+.bundle
+
 .ruby-version
 .env
