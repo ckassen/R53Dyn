@@ -1,8 +1,7 @@
 #gitignore
 
-.idea/*
-
+.idea
 .bundle
 
 .ruby-version
-.env
+Procfile
