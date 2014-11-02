@@ -14,6 +14,32 @@ module R53Dyn
         @dnslib = dnslib
       end
 
+      def checkAuthentication(password, username)
+        if username.nil? || password.nil?
+          error 401, 'Authentication failed'
+        else
+          if ENV['R53DYN_USER'] != username || ENV['R53DYN_PASS'] != password
+            error 401, 'Authentication failed'
+          end
+        end
+      end
+
+      def checkHostname(domain, ipaddr)
+        begin
+          IPAddr.new ipaddr
+        rescue
+          error 500, 'Invalid IP address'
+        end
+
+        if (split = domain.split('.')).length == 3
+          domainparts = split[1, 2].join('.') + '.'
+        else
+          error 500, 'Domain must include a hostname'
+        end
+
+        domainparts
+      end
+
       get '/update' do
 
         domain = params[:domain] || nil
@@ -26,27 +52,11 @@ module R53Dyn
           error 500, 'Invalid parameters provided'
         end
 
-        if username.nil? || password.nil?
-          error 401, 'Authentication failed'
-        else
-          if ENV['R53DYN_USER'] != username || ENV['R53DYN_PASS'] != password
-            error 401, 'Authentication failed'
-          end
-        end
+        self.checkAuthentication(password, username)
 
         # check domain and ip value
         # domain must be a valid domain, better hostname validation required
-        if (split = domain.split('.')).length == 3
-          domainparts = split[1,2].join('.') + '.'
-        else
-          error 500, 'Domain must include a hostname'
-        end
-
-        begin
-          IPAddr.new ipaddr
-        rescue
-          error 500, 'Invalid IP address'
-        end
+        domainparts = self.checkHostname(domain, ipaddr)
 
         # Scan hosted zones for our domain
         zoneid = @dnslib.get_zoneid(domainparts)
