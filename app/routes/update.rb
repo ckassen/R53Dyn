@@ -1,15 +1,18 @@
 # update.rb
 
 require 'sinatra/base'
-require 'aws-sdk'
-
 require 'ipaddr'
 
-require 'lib/r53dyn/aws'
+require 'r53dyn/aws'
 
 module R53Dyn
   module Routes
     class Update < Sinatra::Base
+
+      def initialize(app = nil, dnslib = R53Dyn::Aws.new)
+        super(app)
+        @dnslib = dnslib
+      end
 
       get '/update' do
         # parameters
@@ -20,22 +23,28 @@ module R53Dyn
         domain = params[:domain] || nil
         ipaddr = params[:ip] || nil
 
-        username = params[:username] || nil
-        password = params[:password] || nil
+        username = params[:user] || nil
+        password = params[:pass] || nil
 
         if domain.nil? || ipaddr.nil?
-          error 403, 'Invalid parameters provided'
+          error 500, 'Invalid parameters provided'
         end
 
-        #if username.nil? || password.nil?
-        #  error 401, 'Authentication failed'
-        #end
+        if username.nil? || password.nil?
+          error 401, 'Authentication failed'
+        else
+          if ENV['R53DYN_USER'] != username || ENV['R53DYN_PASS'] != password
+            error 401, 'Authentication failed'
+          end
+        end
 
-        # TODO
         # check domain and ip value
         # domain must be a valid domain, better hostname validation required
-
-        domainparts = domain.split('.')[1,2].join('.') + '.'
+        if (split = domain.split('.')).length == 3
+          domainparts = split[1,2].join('.') + '.'
+        else
+          error 500, 'Domain must include a hostname'
+        end
 
         begin
           IPAddr.new ipaddr
@@ -44,16 +53,13 @@ module R53Dyn
         end
 
         # Scan hosted zones for our domain
-        dnslib = R53Dyn::Aws.new(:access_key_id => ENV['AWS_KEY'],
-                                 :secret_access_key => ENV['AWS_SECRET'])
-
-        zoneid = dnslib.get_zoneid(domainparts)
+        zoneid = @dnslib.get_zoneid(domainparts)
 
         # Found the correct zone, update the ip record
         if zoneid != nil
 
           # Prepare the change record
-          resp_data = dnslib.update_record(zoneid, domain, ipaddr)
+          resp_data = @dnslib.update_record(zoneid, domain, ipaddr)
 
           if resp_data
             #uri = 'http://%s' % domain
@@ -62,6 +68,8 @@ module R53Dyn
           else
             error 500, 'Updating hostname failed'
           end
+        else
+          error 500, 'Updating hostname failed'
         end
       end
     end

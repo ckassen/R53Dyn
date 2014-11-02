@@ -1,7 +1,13 @@
-require 'rake/testtask'
+require 'rake'
 
-Rake::TestTask.new do |t|
-  t.libs.push "lib"
-  t.test_files = FileList['tests/*_test.rb']
-  t.verbose = true
+begin
+  require 'rspec/core/rake_task'
+
+  RSpec::Core::RakeTask.new(:spec) do |t|
+    t.pattern = "./spec/**/*_spec.rb"
+  end
+
+rescue LoadError
 end
+
+task :default => :spec

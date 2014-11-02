@@ -1,16 +1,27 @@
+#
 require 'aws-sdk'
 
 module R53Dyn
   class Aws
 
-    @r53 = nil
+    def initialize(client = nil)
 
-    def initialize(options = {})
-      @r53 = AWS::Route53.new(options)
+      unless client
+        # do aws init here somehow
+        options ={
+            :access_key_id => ENV['AWS_KEY'],
+            :secret_access_key => ENV['AWS_SECRET'],
+        }
+
+        r53 = AWS::Route53.new options
+        @client = r53.client
+      else
+        @client = client
+      end
+
     end
 
     def get_zoneid(domain)
-
       zoneid = nil
 
       if domain.nil?
@@ -22,10 +33,13 @@ module R53Dyn
         return nil
       end
 
-      resp = @r53.client.list_hosted_zones
-      resp[:hosted_zones].each do |zone|
-        if zone[:name] == domain
-          zoneid = zone[:id]
+      resp = @client.list_hosted_zones
+
+      unless resp[:hosted_zones].nil?
+        resp[:hosted_zones].each do |zone|
+          if zone[:name] == domain
+            zoneid = zone[:id]
+          end
         end
       end
 
@@ -42,7 +56,7 @@ module R53Dyn
         change = prepare_record(ipaddr, record)
 
         # Send the change record to the AWS api
-        change_resp = @r53.client.change_resource_record_sets({
+        change_resp = @client.client.change_resource_record_sets({
                                                                   :hosted_zone_id => zoneid,
                                                                   :change_batch => {
                                                                       :changes => [change]

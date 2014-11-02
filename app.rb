@@ -14,7 +14,7 @@ module R53Dyn
       disable :static
     end
 
-    use Rack::Deflater
+    #use Rack::Deflater
     use R53Dyn::Routes::Update
   end
 end
