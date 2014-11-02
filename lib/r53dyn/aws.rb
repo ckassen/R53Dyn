@@ -56,7 +56,7 @@ module R53Dyn
         change = prepare_record(ipaddr, record)
 
         # Send the change record to the AWS api
-        change_resp = @client.client.change_resource_record_sets({
+        change_resp = @client.change_resource_record_sets({
                                                                   :hosted_zone_id => zoneid,
                                                                   :change_batch => {
                                                                       :changes => [change]

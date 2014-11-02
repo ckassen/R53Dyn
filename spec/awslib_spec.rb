@@ -27,4 +27,17 @@ describe "R53Dyn AWS librarie" do
               :resource_records => [{:value => '127.0.0.1'}]}})
     end
   end
+
+  describe "when updating the record" do
+    it "should return true" do
+
+      response = double("AWS::Core::Response")
+      allow(response).to receive(:successful?).and_return(true)
+
+      allow(@client).to receive(:change_resource_record_sets).and_return(response)
+
+      res = @aws.update_record('/hostedzone/abcdef','www.domain.com.','127.0.0.1')
+      expect(res).to eq(true)
+    end
+  end
 end

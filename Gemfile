@@ -8,4 +8,5 @@ group :test do
   gem 'rspec-mocks'
   gem 'rack-test'
   gem 'rake'
+  gem 'codeclimate-test-reporter'
 end

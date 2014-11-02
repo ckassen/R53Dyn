@@ -15,11 +15,7 @@ module R53Dyn
       end
 
       get '/update' do
-        # parameters
-        # domain
-        # ip
-        # username
-        # password
+
         domain = params[:domain] || nil
         ipaddr = params[:ip] || nil
 
@@ -62,8 +58,6 @@ module R53Dyn
           resp_data = @dnslib.update_record(zoneid, domain, ipaddr)
 
           if resp_data
-            #uri = 'http://%s' % domain
-            #@response.headers['Location'] = uri
             "good %s\n" % ipaddr
           else
             error 500, 'Updating hostname failed'
