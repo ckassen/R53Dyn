@@ -1,1 +1,1 @@
-web: bundle exec rackup -E production
+#web: bundle exec rackup -E production
